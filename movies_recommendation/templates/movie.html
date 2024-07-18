@@ -1,0 +1,32 @@
+<!-- movie_details.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .movie-info {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Movie Details</h1>
+    <div class="movie-info">
+        <h2 id="movie-title">{{ title }}</h2>
+        <h4 id="movie-id">{{ id }}</h4>
+        <p><strong>Director:</strong> <span id="director">{{ director }}</span></p>
+        <p><strong>Release Year:</strong> <span id="release-year">{{ release_year }}</span></p>
+        <p><strong>Genre:</strong> <span id="genre">{{ genre }}</span></p>
+        <p><strong>Plot:</strong> <span id="plot">{{ plot }}</span></p>
+    </div>
+</body>
+</html>
