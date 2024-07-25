@@ -1,2 +1,6 @@
-fastapi==0.111.1
+fastapi == 0.111.1
 pydantic>=2.7.0,<3.0.0
+sqlalchemy == 2.0.31
+pandas
+psycopg2-binary
+
