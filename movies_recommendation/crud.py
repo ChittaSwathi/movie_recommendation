@@ -57,6 +57,33 @@ def load_data_from_file(model, file_path: str, db: Session):
             create_movie(db, movie_data)
 
 
+    elif model =='genres':
+        for index, row in df.iterrows():
+            genre_data = schemas.GenreCreate(
+                genreid=row['genreid'],
+                name=row['name'],
+            )
+            create_genre(db, genre_data)
+
+    elif model =='taginfo':
+        for index, row in df.iterrows():
+            taginfo_data = schemas.TagInfoCreate(
+                tagid=row['tagid'],
+                content=row['content'],
+            )
+            create_taginfo(db, taginfo_data)
+
+    elif model =='tags':
+        for index, row in df.iterrows():
+            tags_data = schemas.TagCreate(
+                userid=row['userid'],
+                movieid=row['movieid'],
+                tagid=row['tagid'],
+                timestamp=row['timestamp'],
+            )
+            create_tag(db, tags_data)
+
+
 
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -74,7 +101,7 @@ def create_movie(db: Session, movie: schemas.MovieCreate):
     return db_movie
 
 def create_taginfo(db: Session, taginfo: schemas.TagInfoCreate):
-    db_taginfo = models.TagInfo(content=taginfo.content)
+    db_taginfo = models.TagInfo(tagid=taginfo.tagid, content=taginfo.content)
     db.add(db_taginfo)
     db.commit()
     db.refresh(db_taginfo)

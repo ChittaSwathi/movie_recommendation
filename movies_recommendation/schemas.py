@@ -3,12 +3,15 @@ from typing import List, Optional
 
 class UserBase(BaseModel):
     name: str
+    userid: int
 
 class UserCreate(UserBase):
-    pass
+    userid: int
+    name: str
 
 class User(UserBase):
     userid: int
+    name: str
 
     class Config:
         orm_mode = True
@@ -26,6 +29,7 @@ class Movie(MovieBase):
         orm_mode = True
 
 class TagInfoBase(BaseModel):
+    tagid: int
     content: str
 
 class TagInfoCreate(TagInfoBase):
@@ -33,6 +37,7 @@ class TagInfoCreate(TagInfoBase):
 
 class TagInfo(TagInfoBase):
     tagid: int
+    content: str
 
     class Config:
         orm_mode = True
