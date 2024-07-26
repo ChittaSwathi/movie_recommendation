@@ -84,3 +84,15 @@ class Tag(TagBase):
 
     class Config:
         orm_mode = True
+
+
+class HasAGenreBase(BaseModel):
+    movieid: int
+    genreid: int
+
+class HasAGenreCreate(HasAGenreBase):
+    pass
+
+class HasAGenre(HasAGenreBase):
+    class Config:
+        orm_mode = True

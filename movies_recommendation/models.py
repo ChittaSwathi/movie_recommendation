@@ -1,10 +1,15 @@
 from sqlalchemy import Column, ForeignKey, Integer, Numeric, String, BigInteger, Table
 from sqlalchemy.orm import relationship
 from movies_recommendation.database import Base
+from sqlalchemy.ext.declarative import declarative_base
 
-hasagenre = Table('hasagenre', Base.metadata,
-    Column('movieid', Integer, ForeignKey('movies.movieid')),
-    Column('genreid', Integer, ForeignKey('genres.genreid'))
+Base = declarative_base()
+
+# Association Table
+hasagenre = Table(
+    'hasagenre', Base.metadata,
+    Column('movieid', Integer, ForeignKey('movies.movieid'), primary_key=True),
+    Column('genreid', Integer, ForeignKey('genres.genreid'), primary_key=True)
 )
 
 class User(Base):
@@ -51,3 +56,8 @@ class Tag(Base):
     user = relationship('User', back_populates='tags')
     movie = relationship('Movie', back_populates='tags')
     tag = relationship('TagInfo')
+
+
+# ORM model for hasagenre
+class HasAGenre(Base):
+    __table__ = hasagenre

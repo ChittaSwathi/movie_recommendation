@@ -65,6 +65,14 @@ def load_data_from_file(model, file_path: str, db: Session):
             )
             create_genre(db, genre_data)
 
+    elif model =='hasagenre':
+        for index, row in df.iterrows():
+            hasagenre_data = schemas.HasAGenreCreate(
+                genreid=row['genreid'],
+                movieid=row['movieid'],
+            )
+            create_hasagenre(db, hasagenre_data)
+
     elif model =='taginfo':
         for index, row in df.iterrows():
             taginfo_data = schemas.TagInfoCreate(
@@ -82,8 +90,6 @@ def load_data_from_file(model, file_path: str, db: Session):
                 timestamp=row['timestamp'],
             )
             create_tag(db, tags_data)
-
-
 
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -114,6 +120,12 @@ def create_genre(db: Session, genre: schemas.GenreCreate):
     db.refresh(db_genre)
     return db_genre
 
+def create_hasagenre(db: Session, hasagenre: schemas.HasAGenreCreate):
+    db_hasgenre = models.HasAGenre(movieid=hasagenre.movieid,genreid=hasagenre.genreid)
+    db.add(db_hasgenre)
+    db.commit()
+    db.refresh(db_hasgenre)
+    return db_hasgenre
 
 def create_tag(db: Session, tag: schemas.TagCreate):
     db_tag = models.Tag(
@@ -126,3 +138,4 @@ def create_tag(db: Session, tag: schemas.TagCreate):
     db.commit()
     db.refresh(db_tag)
     return db_tag
+

@@ -90,7 +90,6 @@ async def load_ratings(model:str, db: Session = Depends(get_db)):
     except Exception as e:
         return {"error": str(e)}
 
-
 #todo: run using ---- uvicorn movies_recommendation.main:app --reload
 if __name__ == "__main__":
     import uvicorn
