@@ -7,9 +7,17 @@ from fastapi.templating import Jinja2Templates
 from movies_recommendation import models, schemas, crud
 from movies_recommendation.database import SessionLocal, engine
 from sqlalchemy.orm import Session
-import os
-import pandas as pd
+from sqlalchemy import text
 
+import os
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -56,9 +64,13 @@ async def read_root():
 
 
 @app.get("/movie/{movie_id}", response_class=HTMLResponse)
-async def read_movie_details(request: Request, movie_id: int):
+async def read_movie_details(request: Request, movie_id: int, db: Session = Depends(get_db)):
     # Retrieve movie details based on movie_id (example using a list, replace with database query)
     try:
+        result = db.execute(text('Select * from movies where movieid='+str(movie_id)))
+        items = result.fetchall()
+        print("-------", items)
+
         movie = movies[movie_id]
     except IndexError:
         raise HTTPException(status_code=404, detail="Movie not found")
@@ -72,12 +84,6 @@ def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @app.get("/load_file/{model}")
 async def load_ratings(model:str, db: Session = Depends(get_db)):
