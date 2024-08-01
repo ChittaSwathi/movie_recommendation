@@ -1,4 +1,6 @@
 from typing import Union
+
+import pandas as pd
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -8,7 +10,7 @@ from movies_recommendation import models, schemas, crud
 from movies_recommendation.database import SessionLocal, engine
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-
+import math
 import os
 
 
@@ -62,14 +64,49 @@ async def read_root():
     </html>
     """
 
+@app.get("/movies")
+async def movie_info(request: Request, db: Session = Depends(get_db)):
+    qry = """select m.movieid, m.title as title, g.name as genre, 
+                            r.userid, r.rating, r.timestamp, u.name as username
+                    from movies m 
+                    inner join hasagenre hg on hg.movieid=m.movieid
+                    inner join genres g on g.genreid=hg.genreid
+                    inner join ratings r on r.movieid=m.movieid
+                    inner join users u on u.userid=r.userid
+            """
+    movie_recs = db.execute(text(qry)).fetchall()
+    cols = ['movieid', 'title', 'genre', 'userid', 'rating', 'timestamp', 'username']
+
+    df = pd.DataFrame(movie_recs, columns=cols)
+    grouped = df.groupby('movieid')
+
+    result = {}
+    for movieid, group in grouped:
+        movie_info = group[['title','genre']].iloc[0].to_dict()
+        movie_info['avg_rating'] = math.ceil(group[["rating"]].mean().rating)
+        ratings_info = group[['rating', 'timestamp', 'userid', 'username']].to_dict(orient='records')
+        result[movieid] = {**movie_info, 'ratings':ratings_info}
+
+    return templates.TemplateResponse("movie.html", {"request": request, "movies": result})
+
+
 
 @app.get("/movie/{movie_id}", response_class=HTMLResponse)
 async def read_movie_details(request: Request, movie_id: int, db: Session = Depends(get_db)):
     # Retrieve movie details based on movie_id (example using a list, replace with database query)
     try:
-        result = db.execute(text('Select * from movies where movieid='+str(movie_id)))
-        items = result.fetchall()
-        print("-------", items)
+        res = {}
+        qry = """select m.movieid, m.title as movie_name, g.name as genre, 
+                        r.userid, r.rating, r.timestamp, u.name as user_name
+                from movies m 
+                inner join hasagenre hg on hg.movieid=m.movieid
+                inner join genres g on g.genreid=hg.genreid
+                inner join ratings r on r.movieid=m.movieid
+                inner join users u on u.userid=r.userid"""
+        qry += " where m.movieid = %d"""%(movie_id) if movie_id else ""
+        movies = db.execute(text(qry)).fetchall()
+
+        print("-------", len(movies), movies[:2])
 
         movie = movies[movie_id]
     except IndexError:

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# list all images
+#docker ps
+
+# prune all existing images
+#docker system prune -f
+
 # Build Docker image
 docker build -t fast_api:latest .
 

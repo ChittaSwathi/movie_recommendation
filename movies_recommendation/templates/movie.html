@@ -20,13 +20,20 @@
 </head>
 <body>
     <h1>Movie Details</h1>
-    <div class="movie-info">
-        <h2 id="movie-title">{{ title }}</h2>
-        <h4 id="movie-id">{{ id }}</h4>
-        <p><strong>Director:</strong> <span id="director">{{ director }}</span></p>
-        <p><strong>Release Year:</strong> <span id="release-year">{{ release_year }}</span></p>
-        <p><strong>Genre:</strong> <span id="genre">{{ genre }}</span></p>
-        <p><strong>Plot:</strong> <span id="plot">{{ plot }}</span></p>
-    </div>
+    {% for movieid, details in movies.items() %}
+        <h2>{{ details.title }} ({{ details.genre }}) ({{details.avg_rating}})</h2>
+<!--            {% if details.avg_rating %}-->
+<!--                {% for s in range(details.avg_rating) %}-->
+<!--                   <i class="fa fa-star" />-->
+<!--                {% endfor %}-->
+<!--            {% endif %}-->
+        <ul>
+            {% for rating in details.ratings %}
+                <li>
+                    {{ rating.userid }} - {{ rating.username }} - {{ rating.timestamp }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
 </body>
 </html>
