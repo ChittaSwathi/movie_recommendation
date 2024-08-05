@@ -89,6 +89,32 @@ async def movie_info(request: Request, db: Session = Depends(get_db)):
 
     return templates.TemplateResponse("movie.html", {"request": request, "movies": result})
 
+@app.get("/movies/{movieid}")
+async def movie_details(request: Request, movieid: int, db: Session = Depends(get_db)):
+    qry = """select m.movieid, m.title as title, g.name as genre, 
+                    r.userid, r.rating, r.timestamp, u.name as username
+            from movies m 
+            inner join hasagenre hg on hg.movieid=m.movieid
+            inner join genres g on g.genreid=hg.genreid
+            inner join ratings r on r.movieid=m.movieid
+            inner join users u on u.userid=r.userid
+            where m.movieid=%s"""%(movieid)
+    movie_recs = db.execute(text(qry)).fetchall()
+    cols = ['movieid', 'title', 'genre', 'userid', 'rating', 'timestamp', 'username']
+
+    df = pd.DataFrame(movie_recs, columns=cols)
+    grouped = df.groupby('movieid')
+
+    result = {}
+    for movieid, group in grouped:
+        movie_info = group[['title','genre']].iloc[0].to_dict()
+        movie_info['avg_rating'] = math.ceil(group[["rating"]].mean().rating)
+        ratings_info = group[['rating', 'timestamp', 'userid', 'username']].to_dict(orient='records')
+        result[movieid] = {**movie_info, 'ratings': ratings_info}
+
+    return templates.TemplateResponse("movie.html", {"request": request, "movies": result})
+
+
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
